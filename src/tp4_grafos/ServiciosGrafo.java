@@ -7,117 +7,116 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 
-//En esta clase pongo todos los servicios del grafo (Recorridos, camino mas largo, etc).Refactorice lo que tenia en grafo dirigido hacia esta clase.
+/*En esta clase pongo todos los servicios del grafo (Recorridos, camino mas largo, etc).
+* Refactorice lo que tenia en grafo dirigido hacia esta clase.
+*/
+
 public class ServiciosGrafo <T> {
-
 	private Hashtable<Integer, String> colores;
-	private Hashtable<Integer, Integer> tiempoDescubrimiento;
-	private Hashtable<Integer, Integer> tiempoFinalizacion;
-	private Hashtable<Integer, Boolean> visitados;
-	private Integer tiempo;
-	private Queue<Integer> fila;
-	
-	public ServiciosGrafo() {
-		this.colores = new Hashtable<Integer, String>();              //Tengo la duda si recibir el grafo por constructor o en los metodos.
-		this.tiempoDescubrimiento = new Hashtable<Integer, Integer>();
-		this.tiempoFinalizacion = new Hashtable<Integer, Integer>();
-		this.visitados = new Hashtable<Integer, Boolean>();
-		this.fila = new LinkedList<Integer>();
-		this.tiempo = 0;
-	}
-	
-	//--------------------------------------------------------
-	//---- RECORRIDO DFS
-	
-	public LinkedList<Integer> recorridoDfs(GrafoDirigido<T> grafo) {
-		LinkedList<Integer>retorno = new LinkedList<Integer>();
-		this.tiempoDescubrimiento.clear(); 
-		this.tiempoFinalizacion.clear();   //Hay que limpiar estos tiempos siempre que haga un nuevo recorrido
-		this.tiempo = 0; 
-		
-		Iterator<Integer> itVertices = grafo.obtenerVertices();
-		while(itVertices.hasNext()) {
-			Integer key = itVertices.next();
-			colores.put(key, "Blanco"); //Lo agrego al hashtable de colores
-		}
-	    itVertices = grafo.obtenerVertices(); //Para volver a iterar sobre los vertices
-		while(itVertices.hasNext()) {
-			Integer vertice = itVertices.next();
-			if(colores.get(vertice).equals("Blanco")) {
-				retorno.addAll(DFS_Visit(grafo, vertice));  //RECURSION
-			}
-		}
-		return retorno;
-	}
-	
-	public LinkedList<Integer> DFS_Visit(GrafoDirigido<T>grafo, int vertice) {
-		LinkedList<Integer>retorno = new LinkedList<Integer>();
+    private Hashtable<Integer, Integer> tiempoDescubrimiento;
+    private Hashtable<Integer, Integer> tiempoFinalizacion;
+    private Integer tiempo;
+    private Hashtable<Integer, Boolean> visitados;
+    private Queue<Integer> fila;
 
-		colores.put(vertice, "Amarillo");
-		retorno.add(vertice); //LE AGREGO EL ID DE CADA VERTICE
-		tiempo = tiempo + 1;
+    public ServiciosGrafo() {
+        this. colores = new Hashtable<>();
+        this.tiempoDescubrimiento = new Hashtable<>();
+        this.tiempoFinalizacion = new Hashtable<>();
+        this.visitados = new Hashtable<>();
+        this.fila = new LinkedList<>();
+        this.tiempo = 0;
+    }
 
-		tiempoDescubrimiento.put(vertice, tiempo);
-		Iterator <Integer> itAdyacentes = grafo.obtenerAdyacentes(vertice);
-		while(itAdyacentes.hasNext()) {
-			Integer vAdyacente = itAdyacentes.next();
+    // ---------------- DFS ----------------
+    
+    public LinkedList<Integer> recorridoDfs(GrafoDirigido<T> grafo) {
+        LinkedList<Integer> retorno = new LinkedList<>();
+        this.colores.clear();
+        this.tiempoDescubrimiento.clear();
+        this.tiempoFinalizacion.clear();
+        this.tiempo = 0;
 
-			if(colores.get(vAdyacente).equals("BLANCO")) {
-				retorno.addAll(DFS_Visit(grafo, vAdyacente)); //ACA SE AGREGAN TODOS LOS ID DE LOS VERTICES DE LA RECURSION
-			}
-		}
-		colores.put(vertice, "Negro");
-		tiempo = tiempo + 1; 	
-		tiempoFinalizacion.put(vertice, tiempo);
+        // Inicializar todos los vértices como Blanco
+        Iterator<Integer> itVertices = grafo.obtenerVertices();
+        while (itVertices.hasNext()) {
+            this.colores.put(itVertices.next(), "Blanco");
+        }
 
-		return retorno;
-	}
-	
-	//-----RECORRIDO BFS
-	
+        // Recorrer todos los vértices
+        itVertices = grafo.obtenerVertices();
+        while (itVertices.hasNext()) {
+            Integer vertice = itVertices.next();
+            if (this.colores.get(vertice).equals("Blanco")) {
+                dfsVisit(grafo, vertice, retorno);
+            }
+        }
 
-	public LinkedList<Integer> recorridoBfs(GrafoDirigido<T>grafo){
-		LinkedList<Integer>retorno  = new LinkedList<Integer>();
-		
-		this.fila.clear();
-		this.visitados.clear();  //NO OLVIDAR DE LIMPIAR ESTO
-		
-		Iterator<Integer> itVertices = grafo.obtenerVertices();
-		while(itVertices.hasNext()) {
-			Integer vertice = itVertices.next();
-			visitados.put(vertice, false);
-		}
-		itVertices = grafo.obtenerVertices();
-		while(itVertices.hasNext()) {
-			Integer vertice = itVertices.next();
-			if(visitados.get(vertice) == false) {
-				retorno.addAll(BFS_Visit(grafo, vertice));
-			}
-		}
-		return retorno;
-	}
-	
-	
-	public LinkedList<Integer> BFS_Visit(GrafoDirigido<T> grafo, int vertice){
-		LinkedList<Integer>retorno  = new LinkedList<Integer>();
-		visitados.put(vertice, true);
-		retorno.add(vertice);  //Lo agrego a la linkedList y a la fila
-		fila.add(vertice);
-		while(!fila.isEmpty()) {
-			Integer verticeX = fila.remove(); //VERTICE QUE ESTA EN EL TOPE DE LA FILA
-			Iterator<Integer> itAdyacentes = grafo.obtenerAdyacentes(verticeX); //La primera vez va a ser el que me mandan por parametro
-			while(itAdyacentes.hasNext()) {
-				Integer vAdyacente = itAdyacentes.next();
-				if(visitados.get(vAdyacente)== false) {
-					visitados.put(vAdyacente, true);
-					retorno.add(vAdyacente); //LO AGREGO A LA FILA Y A LA LISTA 
-					fila.add(vAdyacente);
-				}
-			}
-		}
-		return retorno;
-	}
-	//AGREGO ADEMAS DE A LA FILA A LA LISTA PARA PODER RETORNAR EL RECORRIDO EN UNA LISTA!
+        return retorno;
+    }
+
+    private void dfsVisit(GrafoDirigido<T> grafo, int vertice, LinkedList<Integer> retorno) {
+        this.colores.put(vertice, "Amarillo");
+        retorno.add(vertice);
+        this.tiempo++;
+        this.tiempoDescubrimiento.put(vertice, tiempo);
+
+        Iterator<Integer> itAdyacentes = grafo.obtenerAdyacentes(vertice);
+        while (itAdyacentes.hasNext()) {
+            Integer vAdyacente = itAdyacentes.next();
+            if (this.colores.get(vAdyacente).equals("Blanco")) {
+                dfsVisit(grafo, vAdyacente, retorno);
+            }
+        }
+
+        this.colores.put(vertice, "Negro");
+        this.tiempo++;
+        this.tiempoFinalizacion.put(vertice, tiempo);
+    }
+
+    // ---------------- BFS ----------------
+    public LinkedList<Integer> recorridoBfs(GrafoDirigido<T> grafo) {
+        LinkedList<Integer> retorno = new LinkedList<>();
+        visitados.clear();
+        fila.clear();
+
+        // Inicializar todos los vértices como no visitados
+        Iterator<Integer> itVertices = grafo.obtenerVertices();
+        while (itVertices.hasNext()) {
+            visitados.put(itVertices.next(), false);
+        }
+
+        // Recorrer todos los vértices
+        itVertices = grafo.obtenerVertices();
+        while (itVertices.hasNext()) {
+            Integer vertice = itVertices.next();
+            if (!visitados.get(vertice)) {
+                bfsVisit(grafo, vertice, retorno);
+            }
+        }
+
+        return retorno;
+    }
+
+    private void bfsVisit(GrafoDirigido<T> grafo, int vertice, LinkedList<Integer> retorno) {
+        visitados.put(vertice, true);
+        fila.add(vertice);
+        retorno.add(vertice);
+
+        while (!fila.isEmpty()) {
+            Integer verticeX = fila.remove();
+            Iterator<Integer> itAdyacentes = grafo.obtenerAdyacentes(verticeX);
+            while (itAdyacentes.hasNext()) {
+                Integer vAdyacente = itAdyacentes.next();
+                if (!visitados.get(vAdyacente)) {
+                    visitados.put(vAdyacente, true);
+                    fila.add(vAdyacente);
+                    retorno.add(vAdyacente);
+                }
+            }
+        }
+    }
+
 	
 	
 	//-------EJERCICIO 4 --------
