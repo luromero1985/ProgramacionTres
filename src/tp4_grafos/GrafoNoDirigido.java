@@ -141,7 +141,7 @@ import java.util.LinkedList;
 	                int origen = arco.getVerticeOrigen();
 	                int destino = arco.getVerticeDestino();
 
-	                // Solo guardo el arco si origen < destino (criterio fijo)
+	                // Solo guardo el arco si origen < destino (criterio fijo), para que no haya duplicados
 	                if (origen < destino) {
 	                    arcosTotales.add(arco);
 	                }
@@ -149,6 +149,10 @@ import java.util.LinkedList;
 	        }
 	        return arcosTotales.iterator();
 	    }
+	    
+	    
+	    
+	    
 	    @Override
 	    public Iterator<Arco<T>> obtenerArcos(int verticeId) {
 	        if (vertices.containsKey(verticeId)) {
