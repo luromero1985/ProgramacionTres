@@ -28,10 +28,121 @@ public class ServiciosGrafo <T> {
         this.tiempo = 0;
     }
 
+    
+    
+    
+    /*
+     * ¿Por qué usamos Hashtable<Integer, String> colores?
+
+En un recorrido DFS, cada vértice puede estar en uno de 3 estados:
+
+Blanco → no visitado.
+
+Amarillo → descubierto, pero no hemos terminado de explorar sus adyacentes (está “en proceso”).
+
+Negro → completamente visitado.
+
+Entonces, necesitamos asociar cada vértice con un color.
+Ejemplo:
+
+vértice 1 → Blanco
+vértice 2 → Amarillo
+vértice 3 → Negro
+
+
+Para eso, usamos un mapa (Hashtable o HashMap) donde:
+
+la clave (key) es el ID del vértice (por ejemplo, 1, 2, 3),
+
+el valor (value) es el color de ese vértice (Blanco, Amarillo, Negro).
+
+👉 Esto permite consultar rápido:
+
+if (colores.get(vertice) == "Blanco") { ... }
+     
+     
+     
+     ¿Por qué usamos Hashtable<Integer, Integer> tiempoDescubrimiento y tiempoFinalizacion?
+
+DFS no solo recorre, también puede servir para analizar la estructura del grafo (ciclos, componentes, etc.).
+
+tiempoDescubrimiento → el "instante" en que un vértice fue descubierto (pasó de Blanco a Amarillo).
+
+tiempoFinalizacion → el "instante" en que terminamos de explorar todos sus adyacentes (pasó a Negro).
+
+Ejemplo de una corrida DFS:
+
+t = 1 → descubrimos vértice 1
+t = 2 → descubrimos vértice 2
+t = 3 → descubrimos vértice 3
+t = 4 → terminamos vértice 3
+t = 5 → terminamos vértice 2
+t = 6 → terminamos vértice 1
+
+
+Esto se guarda así:
+
+tiempoDescubrimiento[1] = 1
+tiempoFinalizacion[1] = 6
+
+
+👉 Tener estos tiempos permite:
+
+Detectar ciclos.
+
+Encontrar componentes fuertemente conexas.
+
+Construir un orden topológico en grafos dirigidos acíclicos (DAG).
+
+
+
+¿Por qué usamos Hashtable<Integer, Boolean> visitados en BFS?
+
+En BFS no hace falta el sistema de colores.
+
+Solo nos interesa saber si un vértice ya fue visitado o no.
+
+Entonces usamos un mapa donde:
+
+clave = vértice,
+
+valor = true (ya visitado) o false (no visitado).
+
+Ejemplo:
+
+visitados[1] = true
+visitados[2] = true
+visitados[3] = false
+
+
+
+¿Por qué usamos Queue<Integer> fila en BFS?
+
+BFS se basa en recorrer por niveles (primero los vecinos cercanos, después los vecinos de los vecinos, etc.).
+
+Para manejar este orden, usamos una cola (queue):
+
+Cuando encontramos un vértice nuevo → lo metemos al final de la cola.
+
+Sacamos siempre el vértice del frente de la cola para explorarlo.
+
+Ejemplo paso a paso BFS desde 1:
+
+Fila: [1]   → visito 1, agrego sus vecinos
+Fila: [2,3] → visito 2, agrego sus vecinos
+Fila: [3,4] → visito 3, agrego sus vecinos
+Fila: [4]   → visito 4...
+
+ Por eso la cola es fundamental en BFS, igual que la recursión es fundamental en DFS.
+     
+     
+     * */
     // ---------------- DFS ----------------
     
     public LinkedList<Integer> recorridoDfs(GrafoDirigido<T> grafo) {
         LinkedList<Integer> retorno = new LinkedList<>();
+        
+        //Nos aseguramos de que no quede estado de recorridos anteriores porque llamamos varias veces al mismo grafo.
         this.colores.clear();
         this.tiempoDescubrimiento.clear();
         this.tiempoFinalizacion.clear();
@@ -48,6 +159,7 @@ public class ServiciosGrafo <T> {
         while (itVertices.hasNext()) {
             Integer vertice = itVertices.next();
             if (this.colores.get(vertice).equals("Blanco")) {
+            	//lo mando a la recursividad
                 dfsVisit(grafo, vertice, retorno);
             }
         }
@@ -74,7 +186,11 @@ public class ServiciosGrafo <T> {
         this.tiempoFinalizacion.put(vertice, tiempo);
     }
 
+    
+    
+    
     // ---------------- BFS ----------------
+    
     public LinkedList<Integer> recorridoBfs(GrafoDirigido<T> grafo) {
         LinkedList<Integer> retorno = new LinkedList<>();
         visitados.clear();
