@@ -57,7 +57,7 @@ la clave (key) es el ID del vértice (por ejemplo, 1, 2, 3),
 
 el valor (value) es el color de ese vértice (Blanco, Amarillo, Negro).
 
-👉 Esto permite consultar rápido:
+Esto permite consultar rápido:
 
 if (colores.get(vertice) == "Blanco") { ... }
      
@@ -87,7 +87,7 @@ tiempoDescubrimiento[1] = 1
 tiempoFinalizacion[1] = 6
 
 
-👉 Tener estos tiempos permite:
+ Tener estos tiempos permite:
 
 Detectar ciclos.
 
@@ -187,6 +187,10 @@ Fila: [4]   → visito 4...
             Integer vAdyacente = itAdyacentes.next();
             if (this.colores.get(vAdyacente).equals("Blanco")) {
                 dfsVisit(grafo, vAdyacente, retorno);
+            }
+            else if (this.colores.get(vAdyacente).equals("Amarillo")) {
+                // Si llego a un nodo amarillo → ciclo
+                this.hayCiclo = true;
             }
         }
 
