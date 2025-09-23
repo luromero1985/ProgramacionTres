@@ -1,5 +1,6 @@
 package tp4_grafos;
 
+
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -18,8 +19,12 @@ public class ServiciosGrafo <T> {
     private Integer tiempo;
     private Hashtable<Integer, Boolean> visitados;
     private Queue<Integer> fila;
-    private boolean hayCiclo;
-
+    private boolean hayCiclo; //para la actividad 3
+  //para la actividad 4
+    private LinkedList<Integer>caminoMayor = new LinkedList<>();  // Mejor camino encontrado
+   
+    
+    
     public ServiciosGrafo() {
         this. colores = new Hashtable<>();
         this.tiempoDescubrimiento = new Hashtable<>();
@@ -251,7 +256,59 @@ Fila: [4]   → visito 4...
 	
 	
 	//-------EJERCICIO 4 --------
-	public LinkedList<Integer> obtenerRecorridoMasLargo(GrafoDirigido<T> grafo, Integer verticeOrigen, Integer verticeDestino){
+    
+ 
+    public LinkedList<Integer> obtenerCaminoMasLargo(GrafoDirigido<T> grafo, int origen, int destino) {
+        // Limpiamos estado previo
+        this.visitados.clear();
+        this.caminoMayor.clear();
+
+        // Inicializamos visitados en false
+        Iterator<Integer> itVertices = grafo.obtenerVertices();
+        while(itVertices.hasNext()) {
+            this.visitados.put(itVertices.next(), false);
+        }
+
+        // Creamos camino parcial e iniciamos la recursión
+        LinkedList<Integer> caminoParcial = new LinkedList<>();
+        caminoParcial.add(origen);
+        this.visitados.put(origen, true);
+
+        buscarCaminoMasLargo(grafo, origen, destino, caminoParcial);
+
+        return this.caminoMayor;
+    }
+
+    // Método recursivo de backtracking
+    private void buscarCaminoMasLargo(GrafoDirigido<T> grafo, int actual, int destino, LinkedList<Integer> caminoParcial) {
+        if(actual == destino) {
+            // Si llegamos al destino, verificamos si es el camino más largo
+            if(caminoParcial.size() > this.caminoMayor.size()) {
+                this.caminoMayor.clear();
+                this.caminoMayor.addAll(caminoParcial);
+            }
+            return;
+        }
+
+        Iterator<Integer> adyacentes = grafo.obtenerAdyacentes(actual);
+        while(adyacentes.hasNext()) {
+            int v = adyacentes.next();
+            if(!this.visitados.get(v)) {
+                // Avanzamos: agregamos vértice al camino y marcamos como visitado
+                caminoParcial.add(v);
+                this.visitados.put(v, true);
+
+                // Recursión
+                buscarCaminoMasLargo(grafo, v, destino, caminoParcial);
+
+                // Backtracking: deshacemos la acción
+                caminoParcial.removeLast();
+                this.visitados.put(v, false);
+            }
+        }
+    }
+
+	/*public LinkedList<Integer> obtenerRecorridoMasLargo(GrafoDirigido<T> grafo, Integer verticeOrigen, Integer verticeDestino){
 		if(!grafo.contieneVertice(verticeOrigen) || !grafo.contieneVertice(verticeDestino)){ //Hacemos dos metodos,
 			return new LinkedList<Integer>();												//para que no pregunte siempre en la recursion
 		}
@@ -278,7 +335,12 @@ Fila: [4]   → visito 4...
 		}
 		return res;
 	}
-	
+	*/
+    
+    
+    
+    
+    
 	//----------EJERCICIO 5 -------
 	
 	public HashSet<Integer>obtenerVerticesOrigenCamino(GrafoDirigido<T> grafo, int verticeDestino){
