@@ -18,6 +18,7 @@ public class ServiciosGrafo <T> {
     private Integer tiempo;
     private Hashtable<Integer, Boolean> visitados;
     private Queue<Integer> fila;
+    private boolean hayCiclo;
 
     public ServiciosGrafo() {
         this. colores = new Hashtable<>();
@@ -147,6 +148,8 @@ Fila: [4]   → visito 4...
         this.tiempoDescubrimiento.clear();
         this.tiempoFinalizacion.clear();
         this.tiempo = 0;
+        //para la actividad 3, de deteccion de ciclos
+        this.hayCiclo = false; // inicializo ciclo como falso
 
         // Inicializar todos los vértices como Blanco
         Iterator<Integer> itVertices = grafo.obtenerVertices();
@@ -162,6 +165,12 @@ Fila: [4]   → visito 4...
             	//lo mando a la recursividad
                 dfsVisit(grafo, vertice, retorno);
             }
+        }
+        
+        if (this.hayCiclo) {
+            System.out.println("El grafo contiene un ciclo");
+        } else {
+            System.out.println("El grafo es acíclico");
         }
 
         return retorno;
@@ -193,20 +202,20 @@ Fila: [4]   → visito 4...
     
     public LinkedList<Integer> recorridoBfs(GrafoDirigido<T> grafo) {
         LinkedList<Integer> retorno = new LinkedList<>();
-        visitados.clear();
-        fila.clear();
+        this.visitados.clear();
+        this.fila.clear();
 
         // Inicializar todos los vértices como no visitados
         Iterator<Integer> itVertices = grafo.obtenerVertices();
         while (itVertices.hasNext()) {
-            visitados.put(itVertices.next(), false);
+            this.visitados.put(itVertices.next(), false);
         }
 
         // Recorrer todos los vértices
         itVertices = grafo.obtenerVertices();
         while (itVertices.hasNext()) {
             Integer vertice = itVertices.next();
-            if (!visitados.get(vertice)) {
+            if (!this.visitados.get(vertice)) {
                 bfsVisit(grafo, vertice, retorno);
             }
         }
@@ -215,18 +224,20 @@ Fila: [4]   → visito 4...
     }
 
     private void bfsVisit(GrafoDirigido<T> grafo, int vertice, LinkedList<Integer> retorno) {
-        visitados.put(vertice, true);
-        fila.add(vertice);
+        this.visitados.put(vertice, true);
+        this.fila.add(vertice);
         retorno.add(vertice);
 
-        while (!fila.isEmpty()) {
-            Integer verticeX = fila.remove();
+        while (!this.fila.isEmpty()) {
+            Integer verticeX = this.fila.remove();
+            
             Iterator<Integer> itAdyacentes = grafo.obtenerAdyacentes(verticeX);
+            
             while (itAdyacentes.hasNext()) {
                 Integer vAdyacente = itAdyacentes.next();
-                if (!visitados.get(vAdyacente)) {
-                    visitados.put(vAdyacente, true);
-                    fila.add(vAdyacente);
+                if (!this.visitados.get(vAdyacente)) {
+                    this.visitados.put(vAdyacente, true);
+                    this.fila.add(vAdyacente);
                     retorno.add(vAdyacente);
                 }
             }
