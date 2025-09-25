@@ -1,10 +1,11 @@
 package tp4_grafos;
 
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 
@@ -342,58 +343,120 @@ Fila: [4]   → visito 4...
     
     
 	//----------EJERCICIO 5 -------
+    
+   	
+//actividad 5: pensando en un grafo que puede ser ciclico
 	
-	public HashSet<Integer>obtenerVerticesOrigenCamino(GrafoDirigido<T> grafo, int verticeDestino){
-		HashSet<Integer> resultado = new HashSet<Integer>(); //No puede haber valores repetidos
-		
-		if(!grafo.contieneVertice(verticeDestino)) {
-			return resultado;
-		}
-		 // Si contiene el vertice destino, limpio las estructuras de datos y luego        
-      // itero los vertices del grafo y los inicializo como no visitados
-		this.visitados.clear();
-		
-		Iterator<Integer> itVertices = grafo.obtenerVertices();
-		while(itVertices.hasNext()) {
-			Integer vertice = itVertices.next();
-			visitados.put(vertice, false);//Los vertices en un principio los voy a setear a todos en no visitados
-		}
-		itVertices = grafo.obtenerVertices();
-		while(itVertices.hasNext()) {
-			Integer vOrigen = itVertices.next();
-			if(!visitados.get(vOrigen)) { //Si no esta visitado, lo visita
-				resultado.addAll(verticesOrigenConCaminoADestino(grafo, vOrigen,verticeDestino));
-			}
-		}
-		return resultado;
-	}
+	public ArrayList<Integer> obtenerCaminoDeVerticesHaciaVerticeDestino(GrafoDirigido<T> grafo, int verticeDestino) {
+	    ArrayList<Integer> camino = new ArrayList<>();
 
-
-	private HashSet<Integer> verticesOrigenConCaminoADestino(GrafoDirigido<T>grafo, int verticeOrigen, int verticeDestino) {
-	    HashSet<Integer> res = new HashSet<Integer>(); //Para que no agregue repetidos de gusto  
-	    
-	    visitados.put(verticeOrigen, true); //Lo pongo como visitado al vertice para que no lo visite mas
-	    
-	    //Hacer un if aca para retornar res como punto de corte esta mal, porque tengo que seguir por los demas adyacentes
-	    
-	    Iterator<Integer> itAdyacentes = grafo.obtenerAdyacentes(verticeOrigen);
-	    while(itAdyacentes.hasNext()) {
-	    	HashSet<Integer> resParcial = new HashSet<>(); //LA INICIALIZO ACA PARA QUE SE ACTUALICE CUANDO ITERA CON OTROS ADYACENTES
-	    	Integer vAdyacente = itAdyacentes.next();
-	    	if(vAdyacente.equals(verticeDestino)) {  //ESTE ES EL CASO DE CORTE, SINO DEVUELVE UN HASHSET VACIO
-				resParcial.add(verticeOrigen); //Aca tiene que agregar los anteriores si llego al destino --ERROR SI AGREGABA EL vAdyacente ERA EL MISMO
-	    	}
-	    	resParcial.addAll(verticesOrigenConCaminoADestino(grafo, vAdyacente, verticeDestino));
-	    	if(resParcial.size()>0) { //Si llego al destino va a tener al menos un elemento, por eso es clave agregar cuando verticeOrigen == Destino.
-	    		res.add(verticeOrigen); //Aca tiene que agregar los anteriores si llego al destino --ERROR SI AGREGABA EL vAdyacente ERA EL MISMO
-				res.addAll(resParcial); //NO OLVIDAR ESTO NUNCA
-	    	}
+	    if (!grafo.contieneVertice(verticeDestino)) {
+	        return camino; // lista vacía
 	    }
-	    
-	    return res; // Retorno el hashset vacío si no se encontró ningún camino
+
+	    this.visitados.clear();
+
+	    // Inicializo visitados
+	    Iterator<Integer> itVertices = grafo.obtenerVertices();
+	    while (itVertices.hasNext()) {
+	        Integer vertice = itVertices.next();
+	        visitados.put(vertice, false);
+	    }
+
+	    itVertices = grafo.obtenerVertices();
+	    while (itVertices.hasNext()) {
+	        Integer vOrigen = itVertices.next();
+	        ArrayList<Integer> caminoEncontrado = caminoDeVerticesHaciaVerticeDestino(grafo, vOrigen, verticeDestino, new ArrayList<>());
+	        if (!caminoEncontrado.isEmpty()) {
+	            return caminoEncontrado; // devuelvo el primero que encuentre (si necesitás todos, guardás todos)
+	        }
+	    }
+
+	    return camino; // lista vacía si no encontró ninguno
 	}
-		
+
+	private ArrayList<Integer> caminoDeVerticesHaciaVerticeDestino(GrafoDirigido<T> grafo, int vOrigen, int vDestino,  ArrayList<Integer> caminoActual) {
+	    // Evito ciclos
+	    if (this.visitados.get(vOrigen)) {
+	        return new ArrayList<>();
+	    }
+
+	    this.visitados.put(vOrigen, true);
+	    caminoActual.add(vOrigen);
+
+	    // Caso base: llegué al destino
+	    if (vOrigen == vDestino) {
+	        return new ArrayList<>(caminoActual); // copio el camino actual
+	    }
+
+	    // Recorrer adyacentes
+	    Iterator<Integer> itAdyacentes = grafo.obtenerAdyacentes(vOrigen);
+	    while (itAdyacentes.hasNext()) {
+	        Integer vAdyacente = itAdyacentes.next();
+	        ArrayList<Integer> caminoRec = caminoDeVerticesHaciaVerticeDestino(grafo, vAdyacente, vDestino, caminoActual);
+	        if (!caminoRec.isEmpty()) {
+	            return caminoRec; // devuelvo el primer camino válido
+	        }
+	    }
+
+	    // Backtracking
+	    caminoActual.remove(caminoActual.size() - 1);
+	    visitados.put(vOrigen, false);
+
+	    return new ArrayList<>();
+	}
+
 	
+	
+	//actividad 5 con devolución de todos los caminos encontrados y no solo el primero
+	
+	// Declaraciones que van en la clase
+	private List<LinkedList<Integer>> todosLosCaminos = new ArrayList<>();
 
+	// Método público que inicializa el proceso
+	public List<LinkedList<Integer>> obtenerTodosLosCaminos(GrafoDirigido<T> grafo, int origen, int destino) {
+	    todosLosCaminos.clear();
+	    visitados.clear();
+
+	    // Inicializamos visitados en false
+	    Iterator<Integer> itVertices = grafo.obtenerVertices();
+	    while(itVertices.hasNext()) {
+	        visitados.put(itVertices.next(), false);
+	    }
+
+	    // Creamos camino parcial e iniciamos la recursión
+	    LinkedList<Integer> caminoParcial = new LinkedList<>();
+	    caminoParcial.add(origen);
+	    visitados.put(origen, true);
+
+	    buscarTodosLosCaminos(grafo, origen, destino, caminoParcial);
+
+	    return todosLosCaminos;
+	}
+
+	// Método recursivo de backtracking
+	private void buscarTodosLosCaminos(GrafoDirigido<T> grafo, int actual, int destino, LinkedList<Integer> caminoParcial) {
+	    if(actual == destino) {
+	        // Llegamos al destino: guardamos una copia del camino parcial
+	        todosLosCaminos.add(new LinkedList<>(caminoParcial));
+	        return;
+	    }
+
+	    Iterator<Integer> adyacentes = grafo.obtenerAdyacentes(actual);
+	    while(adyacentes.hasNext()) {
+	        int v = adyacentes.next();
+	        if(!visitados.get(v)) {
+	            // Avanzamos: agregamos vértice al camino y marcamos como visitado
+	            caminoParcial.add(v);
+	            visitados.put(v, true);
+
+	            // Recursión
+	            buscarTodosLosCaminos(grafo, v, destino, caminoParcial);
+
+	            // Backtracking: deshacemos la acción
+	            caminoParcial.removeLast();
+	            visitados.put(v, false);
+	        }
+	    }
+	}
 }
-
