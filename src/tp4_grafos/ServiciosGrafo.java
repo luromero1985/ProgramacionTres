@@ -522,4 +522,68 @@ Fila: [4]   → visito 4...
 	    return camino;
 	}
 
-}
+	
+	
+	
+	// ---------------- ACTIVIDAD 7 ----------------
+	// Todos los caminos alternativos entre Buenos Aires y Tandil
+	// evitando el tramo Las Flores - Rauch
+
+	private List<LinkedList<Integer>> caminosAlternativos = new ArrayList<>();
+
+	public List<LinkedList<Integer>> obtenerCaminosAlternativos(GrafoNoDirigido<T> grafo, int origen, int destino, int lasFlores, int tandil) {
+	    
+	    this.caminosAlternativos.clear();
+
+	    // Inicializo visitados
+	    this.visitados.clear();
+	    Iterator<Integer> itVertices = grafo.obtenerVertices();
+	    while (itVertices.hasNext()) {
+	        this.visitados.put(itVertices.next(), false);
+	    }
+
+	    // Camino parcial
+	    LinkedList<Integer> caminoParcial = new LinkedList<>();
+	    caminoParcial.add(origen);
+	    this.visitados.put(origen, true);
+
+	    // Llamada recursiva
+	    dfsCaminosAlternativos(grafo, origen, destino, lasFlores, tandil, caminoParcial);
+
+	    return this.caminosAlternativos;
+	}
+
+	
+	private void dfsCaminosAlternativos(GrafoNoDirigido<T> grafo, int actual, int destino, int lasFlores, int tandil, LinkedList<Integer> caminoParcial) {
+	  
+		// Caso base: llegué al destino
+	    if (actual == destino) {
+	        this.caminosAlternativos.add(new LinkedList<>(caminoParcial));
+	        return;
+	    }
+
+	    Iterator<Integer> adyacentes = grafo.obtenerAdyacentes(actual);
+	    while (adyacentes.hasNext()) {
+	        int v = adyacentes.next();
+
+	        // Evitar tramo bloqueado Las Flores - Rauch
+	        boolean esTramoBloqueado = (actual == lasFlores && v == tandil) || (actual == tandil && v == lasFlores);
+
+	        if (!this.visitados.get(v) && !esTramoBloqueado) {
+	            caminoParcial.add(v);
+	            this.visitados.put(v, true);
+
+	            dfsCaminosAlternativos(grafo, v, destino, lasFlores, tandil, caminoParcial);
+
+	            // Backtracking
+	            caminoParcial.removeLast();
+	            this.visitados.put(v, false);
+	        }
+	    }
+	}
+
+
+	}
+
+
+
