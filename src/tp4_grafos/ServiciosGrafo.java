@@ -415,47 +415,47 @@ Fila: [4]   → visito 4...
 
 	// Método público que inicializa el proceso
 	public List<LinkedList<Integer>> obtenerTodosLosCaminos(GrafoDirigido<T> grafo, int origen, int destino) {
-	    todosLosCaminos.clear();
-	    visitados.clear();
+	    this.todosLosCaminos.clear();
+	    this.visitados.clear();
 
 	    // Inicializamos visitados en false
 	    Iterator<Integer> itVertices = grafo.obtenerVertices();
 	    while(itVertices.hasNext()) {
-	        visitados.put(itVertices.next(), false);
+	        this.visitados.put(itVertices.next(), false);
 	    }
 
 	    // Creamos camino parcial e iniciamos la recursión
 	    LinkedList<Integer> caminoParcial = new LinkedList<>();
 	    caminoParcial.add(origen);
-	    visitados.put(origen, true);
+	    this.visitados.put(origen, true);
 
 	    buscarTodosLosCaminos(grafo, origen, destino, caminoParcial);
 
-	    return todosLosCaminos;
+	    return this.todosLosCaminos;
 	}
 
 	// Método recursivo de backtracking
 	private void buscarTodosLosCaminos(GrafoDirigido<T> grafo, int actual, int destino, LinkedList<Integer> caminoParcial) {
 	    if(actual == destino) {
 	        // Llegamos al destino: guardamos una copia del camino parcial
-	        todosLosCaminos.add(new LinkedList<>(caminoParcial));
+	        this.todosLosCaminos.add(new LinkedList<>(caminoParcial));
 	        return;
 	    }
 
 	    Iterator<Integer> adyacentes = grafo.obtenerAdyacentes(actual);
 	    while(adyacentes.hasNext()) {
 	        int v = adyacentes.next();
-	        if(!visitados.get(v)) {
+	        if(!this.visitados.get(v)) {
 	            // Avanzamos: agregamos vértice al camino y marcamos como visitado
 	            caminoParcial.add(v);
-	            visitados.put(v, true);
+	            this.visitados.put(v, true);
 
 	            // Recursión
 	            buscarTodosLosCaminos(grafo, v, destino, caminoParcial);
 
 	            // Backtracking: deshacemos la acción
 	            caminoParcial.removeLast();
-	            visitados.put(v, false);
+	            this.visitados.put(v, false);
 	        }
 	    }
 	}
