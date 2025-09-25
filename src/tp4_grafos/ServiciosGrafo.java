@@ -459,4 +459,67 @@ Fila: [4]   → visito 4...
 	        }
 	    }
 	}
+	
+	
+	//actividad 6: resolucion con BFS, nos da el camino mas corto para un grafo no ponderado
+	
+	
+	public LinkedList<Integer> caminoMasCorto(GrafoDirigido<T> grafo, int origen, int destino) {
+	    LinkedList<Integer> camino = new LinkedList<>();
+	    Hashtable<Integer, Boolean> visitados = new Hashtable<>();
+	    /*
+	     * Uso una variable local dentro del método porque cada llamada al método crea su propia tabla visitados.
+	     * Es más seguro porque no depende del estado previo de la clase.
+	     * Consume un poco más de memoria, pero es despreciable en la práctica.
+	     * El código queda más aislado y reutilizable (no depende de atributos globales).
+	     * Permite a otros metodos usar en simultaneo a este metodo
+	     * 
+	     * */
+	    Hashtable<Integer, Integer> padre = new Hashtable<>();
+	    Queue<Integer> cola = new LinkedList<>();
+
+	    // Inicializar visitados
+	    Iterator<Integer> itVertices = grafo.obtenerVertices();
+	    while(itVertices.hasNext()) {
+	        visitados.put(itVertices.next(), false);
+	    }
+
+	    // BFS
+	    cola.add(origen);
+	    visitados.put(origen, true);
+
+	    boolean encontrado = false;
+
+	    while(!cola.isEmpty() && !encontrado) {
+	        int actual = cola.remove();
+	        Iterator<Integer> adyacentes = grafo.obtenerAdyacentes(actual);
+	        while(adyacentes.hasNext()) {
+	            int v = adyacentes.next();
+	            if(!visitados.get(v)) {
+	                visitados.put(v, true);
+	                padre.put(v, actual);
+	                cola.add(v);
+	                if(v == destino) {
+	                    encontrado = true;
+	                    break;
+	                }
+	            }
+	        }
+	    }
+
+	    // Reconstruir camino
+	    if(!visitados.get(destino)) {
+	        return camino; // Camino no existe
+	    }
+
+	    int actual = destino;
+	    while(actual != origen) {
+	        camino.addFirst(actual);
+	        actual = padre.get(actual);
+	    }
+	    camino.addFirst(origen);
+
+	    return camino;
+	}
+
 }
