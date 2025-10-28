@@ -531,7 +531,7 @@ Fila: [4]   → visito 4...
 
 	private List<LinkedList<Integer>> caminosAlternativos = new ArrayList<>();
 
-	public List<LinkedList<Integer>> obtenerCaminosAlternativos(GrafoNoDirigido<T> grafo, int origen, int destino, int lasFlores, int tandil) {
+	public List<LinkedList<Integer>> obtenerCaminosAlternativos(GrafoNoDirigido<T> grafo, int origen, int destino, int lasFlores, int rauch) {
 	    
 	    this.caminosAlternativos.clear();
 
@@ -548,13 +548,13 @@ Fila: [4]   → visito 4...
 	    this.visitados.put(origen, true);
 
 	    // Llamada recursiva
-	    dfsCaminosAlternativos(grafo, origen, destino, lasFlores, tandil, caminoParcial);
+	    dfsCaminosAlternativos(grafo, origen, destino, lasFlores, rauch, caminoParcial);
 
 	    return this.caminosAlternativos;
 	}
 
 	
-	private void dfsCaminosAlternativos(GrafoNoDirigido<T> grafo, int actual, int destino, int lasFlores, int tandil, LinkedList<Integer> caminoParcial) {
+	private void dfsCaminosAlternativos(GrafoNoDirigido<T> grafo, int actual, int destino, int lasFlores, int rauch, LinkedList<Integer> caminoParcial) {
 	  
 		// Caso base: llegué al destino
 	    if (actual == destino) {
@@ -567,13 +567,13 @@ Fila: [4]   → visito 4...
 	        int v = adyacentes.next();
 
 	        // Evitar tramo bloqueado Las Flores - Rauch
-	        boolean esTramoBloqueado = (actual == lasFlores && v == tandil) || (actual == tandil && v == lasFlores);
+	        boolean esTramoBloqueado = (actual == lasFlores && v == rauch) || (actual == rauch && v == lasFlores);
 
 	        if (!this.visitados.get(v) && !esTramoBloqueado) {
 	            caminoParcial.add(v);
 	            this.visitados.put(v, true);
 
-	            dfsCaminosAlternativos(grafo, v, destino, lasFlores, tandil, caminoParcial);
+	            dfsCaminosAlternativos(grafo, v, destino, lasFlores, rauch, caminoParcial);
 
 	            // Backtracking
 	            caminoParcial.removeLast();
