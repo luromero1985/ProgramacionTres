@@ -50,6 +50,7 @@ public class BacktrackingSalas {
     	// lista de vecinos
     	ArrayList<Integer> vecinos = new ArrayList<>();
     	Iterator<Integer> it = grafo.obtenerAdyacentes(salaActual);
+    	
     	while (it.hasNext()) {
     	    vecinos.add(it.next());
     	}
@@ -89,11 +90,13 @@ public class BacktrackingSalas {
                 recorrido.add(vecino);
 
                 backtracking(vecino, recorrido);
-            }
-            }
+            
+            
             // Retroceder
             visitadas.remove(vecino);
             recorrido.remove(recorrido.size() - 1);
         }
     }
-
+        
+    }
+    }
