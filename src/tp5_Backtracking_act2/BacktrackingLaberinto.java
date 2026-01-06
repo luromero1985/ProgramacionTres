@@ -22,7 +22,7 @@ public class BacktrackingLaberinto {
 
     BacktrackingLaberinto(Laberinto lab) {
         this.lab = lab;
-        this.visitado = new boolean[lab.getN()][lab.getN()];
+        this.visitado = new boolean[lab.getN()][lab.getN()];  
     }
 
     public List<Posicion> buscar(Posicion inicio, Posicion fin) {
