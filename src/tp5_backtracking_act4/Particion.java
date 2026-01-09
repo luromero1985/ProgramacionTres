@@ -3,12 +3,17 @@ package tp5_backtracking_act4;
 import java.util.ArrayList;
 import java.util.List;
 
+
+
+/*
+ * Particion de conjunto. Dado un conjunti de n enteros se desea encontrar, si existe, una prticion en dos subconjuntos disjuntos,
+ *  tal que la suma de los elementos sea la misma.
+ * */
 public class Particion {
 
 	 private int[] nums;
-	   
-	    private List<Integer> solucion;
-	    private boolean encontrada;
+	 private List<Integer> solucion;
+	 private boolean encontrada;
 	    
 	    
 	    public Particion(int[] nums) {
