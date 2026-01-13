@@ -2,6 +2,7 @@ package tp5_backtracking_act6_forma2;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class CaballoDeAtilia {
 
     private boolean[][] visitadas;
@@ -10,68 +11,109 @@ public class CaballoDeAtilia {
     private int cantSinPasto;
     private int n;
 
-    //  Punto de entrada
-    public List<Posicion> resolver(int n, int cantSinPasto) {
+    // Punto de entrada
+    public List<Posicion> resolver(int n, Posicion origen, int cantSinPasto) {
         this.n = n;
+        this.origen = origen;
         this.cantSinPasto = cantSinPasto;
 
-        // Como el origen NO está dado → pruebo todos
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
+        this.visitadas = new boolean[n][n];
+        this.camino = new ArrayList<>();
 
-                origen = new Posicion(i, j);
-                visitadas = new boolean[n][n];
-                camino = new ArrayList<>();
+        visitadas[origen.getFila()][origen.getColumna()] = true;
+        camino.add(origen);
 
-                visitadas[i][j] = true;
-                camino.add(origen);
-
-                if (back(origen, 1))
-                    return camino;
-            }
+        if (back(origen, 1)) {
+            return camino;
         }
 
-        return null;
+        return new ArrayList<>(); // no hay solución
     }
 
-    // Backtracking
-    private boolean back(Posicion actual, int pasos) {
+    // ================= BACKTRACKING =================
 
-        // Condición de solución
-        if (pasos == cantSinPasto && actual.esVecina(origen))
-            return true;
+    private boolean back(Posicion actual, int nroPisada) {
 
+        // 🔴 PODA 1: me pasé de pisadas
+        if (camino.size() > cantSinPasto) {
+            return false;
+        }
+
+        // 🔴 PODA 2: existe casilla aislada
+        if (hayCasillaAislada()) {
+            return false;
+        }
+
+        // 🟢 Caso base
+        if (nroPisada == cantSinPasto) {
+            return actual.esVecina(origen); // cerrar ciclo
+        }
+
+        // 🔁 Probar movimientos
         for (Posicion sig : actual.vecinos()) {
 
             if (esFactible(sig)) {
 
                 marcar(sig);
-                if (back(sig, pasos + 1))
+                camino.add(sig);
+
+                if (back(sig, nroPisada + 1)) {
                     return true;
+                }
+
                 desmarcar(sig);
+                camino.remove(camino.size() - 1);
             }
         }
 
         return false;
     }
 
-    // Factibilidad
+    // ================= PODAS =================
+
+    private boolean hayCasillaAislada() {
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+
+                if (!visitadas[i][j]) {
+
+                    Posicion p = new Posicion(i, j);
+                    boolean tieneVecinoLibre = false;
+
+                    for (Posicion v : p.vecinos()) {
+                        if (estaDentro(v) && !visitadas[v.getFila()][v.getColumna()]) {
+                            tieneVecinoLibre = true;
+                            break;
+                        }
+                    }
+
+                    if (!tieneVecinoLibre) {
+                        return true; // 🔥 poda fuerte
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    // ================= AUXILIARES =================
+
     private boolean esFactible(Posicion p) {
+        return estaDentro(p) && !visitadas[p.getFila()][p.getColumna()];
+    }
+
+    private boolean estaDentro(Posicion p) {
         int f = p.getFila();
         int c = p.getColumna();
-
-        return f >= 0 && f < n &&
-               c >= 0 && c < n &&
-               !visitadas[f][c];
+        return f >= 0 && f < n && c >= 0 && c < n;
     }
 
     private void marcar(Posicion p) {
         visitadas[p.getFila()][p.getColumna()] = true;
-        camino.add(p);
     }
 
     private void desmarcar(Posicion p) {
         visitadas[p.getFila()][p.getColumna()] = false;
-        camino.remove(camino.size() - 1);
     }
 }
