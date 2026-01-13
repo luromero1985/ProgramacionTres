@@ -4,75 +4,113 @@ package tp5_backtracking_act6_forma2;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CaballoDeAtilia {
+	public class CaballoDeAtilia {
 
-    private boolean[][] visitadas;
-    private List<Posicion> camino;
-    private Posicion origen;
-    private int cantSinPasto;
-    private int n; //tamanio de la matriz
+	    private boolean[][] visitadas;
+	    private List<Posicion> camino;
+	    private Posicion origen;
+	    private int cantSinPasto;
+	    private int n;
 
-    // Punto de entrada
-    public List<Posicion> resolver(int n, Posicion origen, int cantSinPasto) {
-        this.n = n;
-        this.origen = origen;
-        this.cantSinPasto = cantSinPasto;
+	    private int[][] movimientos = {
+	        {1, 0}, {-1, 0}, {0, 1}, {0, -1}
+	    };
 
-        this.visitadas = new boolean[n][n];
-        this.camino = new ArrayList<>();
+	    // 🔹 Punto de entrada (inicio desconocido)
+	    public List<Posicion> resolver(int n, int cantSinPasto) {
 
-        this.back(origen, 1);
+	        this.n = n;
+	        this.cantSinPasto = cantSinPasto;
 
-        return camino;
-    }
+	        for (int i = 0; i < n; i++) {
+	            for (int j = 0; j < n; j++) {
 
-    private boolean back(Posicion actual, int nroPisada) {
+	                visitadas = new boolean[n][n];
+	                camino = new ArrayList<>();
 
-        // marco
-        visitadas[actual.getFila()][actual.getColumna()] = true;
-        camino.add(actual);
+	                origen = new Posicion(i, j);
+	                visitadas[i][j] = true;
+	                camino.add(origen);
 
-        // caso base
-        if (nroPisada == cantSinPasto) {
-            if (actual.esVecina(origen)) {
-                return true; // solución encontrada
-            }
-        } else {
+	                if (back(origen, 1)) {
+	                    return camino;
+	                }
+	            }
+	        }
 
-            // movimientos posibles
-            int[][] movimientos = {
-                {1, 0}, {-1, 0}, {0, 1}, {0, -1}
-            };
+	        return null; // no existe recorrido
+	    }
 
-            for (int[] mov : movimientos) {
+	    // 🔹 Backtracking
+	    private boolean back(Posicion actual, int nroPisada) {
 
-                Posicion sig = new Posicion(
-                    actual.getFila() + mov[0],
-                    actual.getColumna() + mov[1]
-                );
+	        // ✅ Poda fuerte
+	        if (hayCasillaAislada())
+	            return false;
 
-                if (esFactible(sig)) {
-                    if (back(sig, nroPisada + 1)) {
-                        return true;
-                    }
-                }
-            }
-        }
+	        // ✅ Caso base
+	        if (nroPisada == cantSinPasto) {
+	            return actual.esVecina(origen);
+	        }
 
-        // deshacer (backtrack)
-        visitadas[actual.getFila()][actual.getColumna()] = false;
-        camino.remove(camino.size() - 1);
+	        for (int[] mov : movimientos) {
 
-        return false;
-    }
+	            int nf = actual.getFila() + mov[0];
+	            int nc = actual.getColumna() + mov[1];
 
-    private boolean esFactible(Posicion p) {
-        int f = p.getFila();
-        int c = p.getColumna();
+	            if (esFactible(nf, nc)) {
 
-        if (f < 0 || f >= n || c < 0 || c >= n)
-            return false;
+	                Posicion sig = new Posicion(nf, nc);
 
-        return !visitadas[f][c];
-    }
-}
+	                visitadas[nf][nc] = true;
+	                camino.add(sig);
+
+	                if (back(sig, nroPisada + 1))
+	                    return true;
+
+	                // 🔙 back
+	                visitadas[nf][nc] = false;
+	                camino.remove(camino.size() - 1);
+	            }
+	        }
+
+	        return false;
+	    }
+
+	    // 🔹 Movimiento válido
+	    private boolean esFactible(int f, int c) {
+	        return f >= 0 && f < n && c >= 0 && c < n && !visitadas[f][c];
+	    }
+
+	    // 🔥 PODA FUERTE: casilla aislada
+	    private boolean hayCasillaAislada() {
+
+	        for (int i = 0; i < n; i++) {
+	            for (int j = 0; j < n; j++) {
+
+	                if (!visitadas[i][j]) {
+
+	                    boolean tieneSalida = false;
+
+	                    for (int[] m : movimientos) {
+	                        int ni = i + m[0];
+	                        int nj = j + m[1];
+
+	                        if (ni >= 0 && ni < n && nj >= 0 && nj < n) {
+	                            if (!visitadas[ni][nj]) {
+	                                tieneSalida = true;
+	                                break;
+	                            }
+	                        }
+	                    }
+
+	                    if (!tieneSalida)
+	                        return true; // 💣 rama muerta
+	                }
+	            }
+	        }
+
+	        return false;
+	    }
+	}
+
