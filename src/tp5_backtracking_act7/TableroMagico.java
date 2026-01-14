@@ -1,5 +1,10 @@
 package tp5_backtracking_act7;
 
+/*
+ * Tablero mágico. Dado un tablero de tamaño nxn, construir un algoritmo que ubique (si es posible)
+ *  nxn numeros naturales diferentes, entre 1 y k (con k>n*n), de manera tal que la suma de las columnas
+ *   y de las filas sea igual a S.
+ * */
 public class TableroMagico {
 	 private int n;
 	 private int k;
@@ -65,7 +70,7 @@ public class TableroMagico {
 	                    sumaFilas[fila] += num;
 	                    sumaColumnas[col] += num;
 
-	                    // Poda fuerte: cerrar fila/col
+	                    // cerrar fila/col
 	                    if (esValidoCierre(fila, col)) {
 
 	                        if (back(sigFila, sigCol)) {
