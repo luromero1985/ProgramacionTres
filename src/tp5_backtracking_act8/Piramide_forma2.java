@@ -1,13 +1,20 @@
 package tp5_backtracking_act8;
 
 import java.util.ArrayList;
-
+// =============================
+/*
+ * Colocar un entero positivo (menor que cierto valor entero k dado)
+ * en cada casilla de una piramide de base B (valor entero dado) de modo que 
+ * cada numero sea iagual a la suma de las casillas sobre las que 
+ * está apoyado. Los npumeros de todas las casillas debens ser diferentes.
+ * */
+// =============================
 public class Piramide_forma2 {
 
     private int B;
     private int k;
     private boolean[] usados;
-
+    private ArrayList<ArrayList<Integer>> solucion; // guardo la solución final
     // =============================
     // Punto de entrada
     // =============================
@@ -16,22 +23,25 @@ public class Piramide_forma2 {
         this.B = B;
         this.k = k;
         this.usados = new boolean[k];
+        this.solucion = null;
+        
+        backBase(0, new ArrayList<>());
 
-        ArrayList<Integer> base = backBase(0, new ArrayList<>());
-
-        if (base == null)
-            return null;
-
-        return construirPiramide(base);
+        return solucion;
     }
 
     // =============================
     // Backtracking sobre la base
     // =============================
-    private ArrayList<Integer> backBase(int pos, ArrayList<Integer> base) {
+    private boolean backBase(int pos, ArrayList<Integer> base) {
 
         if (pos == B) {
-            return base;
+        	 ArrayList<ArrayList<Integer>> piramide = construirPiramide(base);
+        	 if (piramide != null) {
+                 solucion = piramide;
+                 return true; // corto al encontrar solución
+             }
+        return false;  //esta base no sirve
         }
 
         for (int num = 1; num < k; num++) {
@@ -42,23 +52,21 @@ public class Piramide_forma2 {
                 usados[num] = true;
 
                 if (esBaseParcialValida(base)) {
-                    ArrayList<Integer> res = backBase(pos + 1, base);
-                    if (res != null) {
-                        return res;
-                    }
+                	if (backBase(pos + 1, base)) {
+                        return true;
                 }
-
+                }
                 // BACKTRACK (siempre)
                 base.remove(base.size() - 1);
                 usados[num] = false;
             }
         }
 
-        return null;
+        return false;
     }
 
     // =============================
-    // Poda parcial
+    // Poda parcial sobre la base
     // =============================
     private boolean esBaseParcialValida(ArrayList<Integer> base) {
 
@@ -83,6 +91,7 @@ public class Piramide_forma2 {
             vistos[v] = true;
         }
 
+        // construir hacia arriba
         while (piramide.get(0).size() > 1) {
 
             ArrayList<Integer> filaInferior = piramide.get(0);
