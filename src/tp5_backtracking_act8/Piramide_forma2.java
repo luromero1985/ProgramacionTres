@@ -11,107 +11,109 @@ import java.util.ArrayList;
 // =============================
 public class Piramide_forma2 {
 
-    private int B;
-    private int k;
-    private boolean[] usados;
-    private ArrayList<ArrayList<Integer>> solucion; // guardo la solución final
-    // =============================
-    // Punto de entrada
-    // =============================
-    public ArrayList<ArrayList<Integer>> resolver(int B, int k) {
+	private int B;
+	private int k;
+	private boolean[] usados;
+	private ArrayList<ArrayList<Integer>> solucion; // guardo la solución final
+	// =============================
+	// Punto de entrada
+	// =============================
+	public ArrayList<ArrayList<Integer>> resolver(int B, int k) {
 
-        this.B = B;
-        this.k = k;
-        this.usados = new boolean[k];
-        this.solucion = null;
-        
-        backBase(0, new ArrayList<>());
+		this.B = B;
+		this.k = k;
+		this.usados = new boolean[k];
+		this.solucion = null;
 
-        return solucion;
-    }
+		backBase(0, new ArrayList<>());
 
-    // =============================
-    // Backtracking sobre la base
-    // =============================
-    private boolean backBase(int pos, ArrayList<Integer> base) {
+		return solucion;
+	}
 
-        if (pos == B) {
-        	 ArrayList<ArrayList<Integer>> piramide = construirPiramide(base);
-        	 if (piramide != null) {
-                 solucion = piramide;
-                 return true; // corto al encontrar solución
-             }
-        return false;  //esta base no sirve
-        }
+	// =============================
+	// Backtracking sobre la base
+	// =============================
+	private boolean backBase(int pos, ArrayList<Integer> base) {
 
-        for (int num = 1; num < k; num++) {
+		if (pos == B) {
+			ArrayList<ArrayList<Integer>> piramide = construirPiramide(base);
+			if (piramide != null) {
+				solucion = piramide;
+				return true; // corto al encontrar solución
+			}
+			return false;  //esta base no sirve
+		}
 
-            if (!usados[num]) {
+		for (int num = 1; num < k; num++) {
 
-                base.add(num);
-                usados[num] = true;
+			if (!usados[num]) {
 
-                if (esBaseParcialValida(base)) {
-                	if (backBase(pos + 1, base)) {
-                        return true;
-                }
-                }
-                // BACKTRACK (siempre)
-                base.remove(base.size() - 1);
-                usados[num] = false;
-            }
-        }
+				base.add(num);
+				usados[num] = true;
 
-        return false;
-    }
+				if (esBaseParcialValida(base)) {
+					if (backBase(pos + 1, base)) {
+						return true;
+					}
+				}
+				// BACKTRACK (siempre)
+				base.remove(base.size() - 1);
+				usados[num] = false;
+			}
+		}
 
-    // =============================
-    // Poda parcial sobre la base
-    // =============================
-    private boolean esBaseParcialValida(ArrayList<Integer> base) {
+		return false;
+	}
 
-        int n = base.size();
-        if (n < 2) return true;
+	// =============================
+	// Poda parcial sobre la base
+	// =============================
+	private boolean esBaseParcialValida(ArrayList<Integer> base) {
 
-        int suma = base.get(n - 1) + base.get(n - 2);
-        return suma < k;
-    }
+		int n = base.size();
+		if (n < 2) return true;
 
-    // =============================
-    // Construcción de la pirámide
-    // =============================
-    private ArrayList<ArrayList<Integer>> construirPiramide(ArrayList<Integer> base) {
+		int suma = base.get(n - 1) + base.get(n - 2);
+		if (usados[suma]) return false;
+		if(suma>=k) return false;
+		return true;
+	}
 
-        ArrayList<ArrayList<Integer>> piramide = new ArrayList<>();
-        boolean[] vistos = new boolean[k];
+	// =============================
+	// Construcción de la pirámide
+	// =============================
+	private ArrayList<ArrayList<Integer>> construirPiramide(ArrayList<Integer> base) {
 
-        // base
-        piramide.add(new ArrayList<>(base));
-        for (int v : base) {
-            vistos[v] = true;
-        }
+		ArrayList<ArrayList<Integer>> piramide = new ArrayList<>();
+		boolean[] vistos = new boolean[k];
 
-        // construir hacia arriba
-        while (piramide.get(0).size() > 1) {
+		// base
+		piramide.add(new ArrayList<>(base));
+		for (int v : base) {
+			vistos[v] = true;
+		}
 
-            ArrayList<Integer> filaInferior = piramide.get(0);
-            ArrayList<Integer> nuevaFila = new ArrayList<>();
+		// construir hacia arriba
+		while (piramide.get(0).size() > 1) {
 
-            for (int i = 0; i < filaInferior.size() - 1; i++) {
+			ArrayList<Integer> filaInferior = piramide.get(0);
+			ArrayList<Integer> nuevaFila = new ArrayList<>();
 
-                int val = filaInferior.get(i) + filaInferior.get(i + 1);
+			for (int i = 0; i < filaInferior.size() - 1; i++) {
 
-                if (val >= k || vistos[val]) {
-                    return null;
-                }
+				int val = filaInferior.get(i) + filaInferior.get(i + 1);
 
-                nuevaFila.add(val);
-                vistos[val] = true;
-            }
+				if (val >= k || vistos[val]) {
+					return null;
+				}
 
-            piramide.add(0, nuevaFila);
-        }
+				nuevaFila.add(val);
+				vistos[val] = true;
+			}
 
-        return piramide;
-    }
+			piramide.add(0, nuevaFila);
+		}
+
+		return piramide;
+	}
 }
