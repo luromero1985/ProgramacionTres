@@ -33,6 +33,8 @@ public class ActividadesCompatibles {
 		        finUltima = f[i];
 		    }
 		}
+		
+		return solucion;
 	}
 
 	
