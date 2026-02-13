@@ -34,7 +34,7 @@ public class DistanciasDijkstra {
 	        enS[u] = true; // S = S U {u}
 
 	        // Relajación de vecinos de u
-	        for (Arco a : G.adyacentes(u)) {
+	        for (Arista a : G.adyacentes(u)) {
 	            int v = a.destino();
 	            int w = a.peso(); // peso(u, v)
 
