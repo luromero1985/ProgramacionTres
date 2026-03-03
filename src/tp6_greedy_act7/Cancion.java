@@ -71,7 +71,7 @@ public class Cancion {
 	
 	 @Override
 	    public String toString() {
-	        return nombre + " (" + genero + ") - " + tamanioKB + "KB";
+	        return nombre + " (" + genero + ") - " + tamanio + "KB";
 	    }
 	
 }
