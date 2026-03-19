@@ -27,11 +27,11 @@ public class Combinaciones {
 	public ArrayList<ArrayList<Integer>>combinaciones(int n, int v){
 		this.lista=new ArrayList<>();
 		
-		back(n,v,new ArrayList<Integer>(),0,1);   //start en 1
+		back(n, v, new ArrayList<>(), 0, 1, 0);  //start en 1
 		return lista;
 	}
 	
-	private void back(int n, int v, ArrayList<Integer>parcial, int suma, int start) {
+	private void back(int n, int v, ArrayList<Integer>parcial, int suma, int start, int contActual) {
 		
 		if(suma==v) {
 			lista.add(new ArrayList<>(parcial));  //siempre hacer copia!
@@ -42,16 +42,17 @@ public class Combinaciones {
 	        if (suma + i > v) {
 	        	break; // poda por monotonía
 	        }
-	     // contar repeticiones de i en parcial
-	        int repeticion = 0;
-	        for (int x : parcial) {
-	        	if (x == i) {
-	        		repeticion++;
-	        	}
+	     // calculo de repeticiones
+	        int repeticion;
+	        if(i==start) { //si el numero es igual al anterior
+	        	repeticion=contActual;
+	        } else {
+	        	repeticion=0;
 	        }
+	        
 	        if (repeticion < MAXIMO) {
 	            parcial.add(i);
-	            back(n, v, parcial, suma + i, i); // i como nuevo start
+	            back(n, v, parcial, suma + i, i,repeticion+1); // i como nuevo start
 	            parcial.remove(parcial.size() - 1);
 	    	}
 		}
