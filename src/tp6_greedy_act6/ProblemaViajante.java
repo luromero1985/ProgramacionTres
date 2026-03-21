@@ -14,7 +14,8 @@ public class ProblemaViajante {
 	    visitado[actual] = true;
 	    recorrido.add(actual);
 
-	    for (int paso = 1; paso < n; paso++) {
+	    int ciudadesRestantes=n-1;
+	    while (ciudadesRestantes>0) {
 
 	        int siguiente = -1;
 	        int mejorDist = Integer.MAX_VALUE;
@@ -29,6 +30,7 @@ public class ProblemaViajante {
 	        actual = siguiente;
 	        visitado[actual] = true;
 	        recorrido.add(actual);
+	        ciudadesRestantes--;
 	    }
 
 	    // volver al origen
