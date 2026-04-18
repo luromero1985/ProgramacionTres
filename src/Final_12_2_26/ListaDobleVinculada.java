@@ -62,7 +62,7 @@ public class ListaDobleVinculada<T> {
 	    } else {
 	        actual = last;
 	        for (int i = size - 1; i > posicion - 1; i--)
-	            actual = actual.getPrev();
+	            actual = actual.getPrev(); 
 	    }
 
 	    // actual es el nodo anterior a donde insertamos
